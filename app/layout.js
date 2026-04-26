@@ -5,7 +5,7 @@ export const metadata = {
   description:
     "A cute React + Next.js website for BIGEM with canvas animation and playful style.",
   icons: {
-    icon: "/img/logo.png",
+    icon: "/img/favicon.ico",
   },
 };
 
