@@ -31,6 +31,7 @@ export default function Home() {
   const [statusMessage, setStatusMessage] = useState("");
   const [apiResponse, setApiResponse] = useState("");
   const [pulseMagic, setPulseMagic] = useState(false);
+  const [showMagicCanvas, setShowMagicCanvas] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chupaCount, setChupaCount] = useState(1);
   const [purchaseMessage, setPurchaseMessage] = useState("");
@@ -50,7 +51,11 @@ export default function Home() {
   const handleCuteMotion = () => {
     setStatusMessage("Sparkles activated! ✨");
     setPulseMagic(true);
-    window.setTimeout(() => setPulseMagic(false), 700);
+    setShowMagicCanvas(true);
+    window.setTimeout(() => {
+      setPulseMagic(false);
+      setShowMagicCanvas(false);
+    }, 1800);
   };
 
   const handleAmountChange = (event) => {
@@ -137,7 +142,7 @@ export default function Home() {
   return (
     <>
       <main className="page-shell">
-        <MagicCanvas />
+        {showMagicCanvas ? <MagicCanvas /> : null}
 
         <header className="nav-panel">
           <div className="logo-badge">BIGEM</div>
