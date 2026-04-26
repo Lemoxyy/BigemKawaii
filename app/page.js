@@ -49,13 +49,17 @@ export default function Home() {
   };
 
   const handleCuteMotion = () => {
+    if (showMagicCanvas) {
+      setStatusMessage("Sparkles turned off. See you later! 💫");
+      setPulseMagic(false);
+      setShowMagicCanvas(false);
+      return;
+    }
+
     setStatusMessage("Sparkles activated! ✨");
     setPulseMagic(true);
     setShowMagicCanvas(true);
-    window.setTimeout(() => {
-      setPulseMagic(false);
-      setShowMagicCanvas(false);
-    }, 1800);
+    window.setTimeout(() => setPulseMagic(false), 700);
   };
 
   const handleAmountChange = (event) => {
