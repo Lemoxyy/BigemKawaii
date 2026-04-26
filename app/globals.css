@@ -84,11 +84,19 @@ a {
   flex-wrap: wrap;
 }
 
-.nav-links a {
-  text-decoration: none;
-  color: var(--muted);
-  font-weight: 700;
-  transition: color 0.22s ease;
+.nav-toggle {
+  display: none;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 14px;
+  transition: background 0.22s ease;
+}
+
+.nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .nav-links a:hover {
@@ -461,6 +469,34 @@ a {
   .nav-panel {
     flex-direction: column;
     align-items: flex-start;
+  }
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: var(--shadow);
+  }
+  .nav-links.open {
+    display: flex;
+  }
+  .nav-links a {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(69, 44, 76, 0.08);
+  }
+  .nav-links a:last-child {
+    border-bottom: none;
   }
   .feature-grid,
   .mini-card-grid {

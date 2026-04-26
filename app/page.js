@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Heart, Star, Command } from "lucide-react";
+import { Sparkles, Heart, Star, Command, Menu, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import MagicCanvas from "../components/MagicCanvas";
 
@@ -31,6 +31,7 @@ export default function Home() {
   const [statusMessage, setStatusMessage] = useState("");
   const [apiResponse, setApiResponse] = useState("");
   const [pulseMagic, setPulseMagic] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const scrollToSection = (id) => {
     const section = document.querySelector(id);
@@ -53,15 +54,21 @@ export default function Home() {
     }
     setStatusMessage("Sending test message to Supabase...");
     try {
-      const { data, error } = await supabase.from("contact_messages").insert([
-        {
-          name: "BIGEM Tester",
-          favorite: "kawaii vibes",
-          message: "Hello from the button!",
-        },
-      ]);
+      const { data, error } = await supabase
+        .from("contact_messages")
+        .insert([
+          {
+            name: "BIGEM Tester",
+            favorite: "kawaii vibes",
+            message: "Hello from the button!",
+          },
+        ])
+        .select();
       if (error) throw error;
-      setApiResponse("✨ Test message saved to Supabase!");
+      console.log("Supabase demo insert data:", data);
+      setApiResponse(
+        `✨ Test message saved to Supabase! ${JSON.stringify(data)}`,
+      );
       setStatusMessage("Supabase API response received!");
     } catch (err) {
       setApiResponse(`Error: ${err.message}`);
@@ -86,8 +93,10 @@ export default function Home() {
     try {
       const { data, error } = await supabase
         .from("contact_messages")
-        .insert([{ name, favorite, message }]);
+        .insert([{ name, favorite, message }])
+        .select();
       if (error) throw error;
+      console.log("Supabase form insert data:", data);
       setApiResponse(`💖 Thank you ${name}! Your message has been saved.`);
       setStatusMessage("Message sent successfully!");
       form.reset();
@@ -103,10 +112,25 @@ export default function Home() {
 
       <header className="nav-panel">
         <div className="logo-badge">BIGEM</div>
-        <nav className="nav-links">
-          <a href="#about">About</a>
-          <a href="#magic">Magic</a>
-          <a href="#contact">Contact</a>
+        <button
+          type="button"
+          className="nav-toggle"
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-expanded={mobileMenuOpen}
+          aria-label="Toggle navigation menu"
+        >
+          {mobileMenuOpen ? <X /> : <Menu />}
+        </button>
+        <nav className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
+          <a href="#about" onClick={() => setMobileMenuOpen(false)}>
+            About
+          </a>
+          <a href="#magic" onClick={() => setMobileMenuOpen(false)}>
+            Magic
+          </a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
+            Contact
+          </a>
         </nav>
       </header>
 
