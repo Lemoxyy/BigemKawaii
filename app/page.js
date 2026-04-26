@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Heart, Star, Command, Menu, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
@@ -32,6 +32,13 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState("");
   const [pulseMagic, setPulseMagic] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chupaCount, setChupaCount] = useState(1);
+  const [purchaseMessage, setPurchaseMessage] = useState("");
+  const costPerChupa = 15;
+  const khaltiPublicKey = process.env.NEXT_PUBLIC_KHALTI_PUBLIC_KEY;
+  const esewaMerchantId = process.env.NEXT_PUBLIC_ESEWA_MERCHANT_ID;
+  const esewaSuccessUrl = process.env.NEXT_PUBLIC_ESEWA_SUCCESS_URL;
+  const esewaFailureUrl = process.env.NEXT_PUBLIC_ESEWA_FAILURE_URL;
 
   const scrollToSection = (id) => {
     const section = document.querySelector(id);
@@ -44,6 +51,27 @@ export default function Home() {
     setStatusMessage("Sparkles activated! ✨");
     setPulseMagic(true);
     window.setTimeout(() => setPulseMagic(false), 700);
+  };
+
+  const handleAmountChange = (event) => {
+    const value = Number(event.target.value);
+    if (Number.isNaN(value) || value < 1) {
+      setChupaCount(1);
+      return;
+    }
+    setChupaCount(value);
+  };
+
+  const handleEsewaPayment = () => {
+    setPurchaseMessage(
+      "Payment is not completed yet. Please check back soon for the full checkout flow.",
+    );
+  };
+
+  const handleKhaltiPayment = () => {
+    setPurchaseMessage(
+      "Payment is not completed yet. Please check back soon for the full checkout flow.",
+    );
   };
 
   const handleApiDemo = async () => {
@@ -107,202 +135,259 @@ export default function Home() {
   };
 
   return (
-    <main className="page-shell">
-      <MagicCanvas />
+    <>
+      <main className="page-shell">
+        <MagicCanvas />
 
-      <header className="nav-panel">
-        <div className="logo-badge">BIGEM</div>
-        <button
-          type="button"
-          className="nav-toggle"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-expanded={mobileMenuOpen}
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <X /> : <Menu />}
-        </button>
-        <nav className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
-          <a href="#about" onClick={() => setMobileMenuOpen(false)}>
-            About
-          </a>
-          <a href="#magic" onClick={() => setMobileMenuOpen(false)}>
-            Magic
-          </a>
-          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
-            Contact
-          </a>
-        </nav>
-      </header>
-
-      <section className="hero-section">
-        <motion.div
-          className="hero-copy"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <span className="hero-tag">Welcome to my kawaii corner</span>
-          <h1>
-            Hi, I&apos;m <span>BIGEM</span>
-          </h1>
-          <p>
-            A cute React + Next.js playground with canvas sprites, bubbly
-            motion, and soft pastel energy.
-          </p>
-
-          <div className="hero-actions">
-            <button
-              type="button"
-              className="btn hero-btn"
-              onClick={() => scrollToSection("#about")}
-            >
-              <Sparkles className="icon" /> Explore
-            </button>
-            <button
-              type="button"
-              className="btn ghost-btn"
-              onClick={() => scrollToSection("#contact")}
-            >
-              <span className="icon">📩</span> Send a smile
-            </button>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="hero-card"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={
-            pulseMagic
-              ? { scale: [1, 1.03, 1], rotate: [0, 2, -2, 0], opacity: 1 }
-              : { scale: 1, opacity: 1 }
-          }
-          transition={{ duration: 0.7, ease: "easeOut" }}
-        >
-          <div className="cute-face">
-            <div className="cheek left" />
-            <div className="cheek right" />
-            <div className="mouth" />
-          </div>
-          <div className="hero-sparkles">
-            <span>💖</span>
-            <span>🌟</span>
-            <span>🍓</span>
-          </div>
-        </motion.div>
-      </section>
-
-      <section id="about" className="section-panel">
-        <div className="section-heading">
-          <span className="label">About BIGEM</span>
-          <h2>Design made for curious kids and charming dreamers</h2>
-        </div>
-
-        <div className="feature-grid">
-          {featureItems.map((item) => (
-            <motion.article
-              key={item.title}
-              className="feature-card"
-              whileHover={{ y: -8 }}
-              transition={{ type: "spring", stiffness: 260, damping: 18 }}
-            >
-              <div className="feature-icon">{item.icon}</div>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </motion.article>
-          ))}
-        </div>
-      </section>
-
-      <section id="magic" className="section-panel magic-panel">
-        <div className="magic-layout">
-          <div>
-            <span className="label">Canvas magic</span>
-            <h2>
-              Animated shapes, floating sprites, and a playful Node-powered API.
-            </h2>
-            <p>
-              This site uses Next.js for React rendering, Framer Motion for page
-              animation, GSAP for subtle effects, and a small API route to show
-              Node.js capability.
-            </p>
-            <div className="magic-buttons">
-              <button
-                type="button"
-                className="btn soft-btn"
-                onClick={handleCuteMotion}
-              >
-                <Star className="icon" /> Cute motion
-              </button>
-              <button
-                type="button"
-                className="btn soft-btn"
-                onClick={handleApiDemo}
-              >
-                <Command className="icon" /> Node API
-              </button>
-            </div>
-            {statusMessage ? (
-              <div className="status-banner">{statusMessage}</div>
-            ) : null}
-            {apiResponse ? (
-              <div className="api-response">{apiResponse}</div>
-            ) : null}
-          </div>
-
-          <div className="magic-card">
-            <div className="magic-card-badge">Kawaii Lab</div>
-            <p>
-              Everything here is cute, responsive, and built with React
-              components backed by Next.js routes.
-            </p>
-            <div className="mini-card-grid">
-              <div className="mini-card">🍬 Candy code</div>
-              <div className="mini-card">✨ Sparkly state</div>
-              <div className="mini-card">🌈 Smooth motion</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" className="section-panel contact-section">
-        <div className="section-heading">
-          <span className="label">Say Hello</span>
-          <h2>Send a cute message to BIGEM</h2>
-        </div>
-
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <label>
-            Your nickname
-            <input
-              name="name"
-              type="text"
-              placeholder="e.g. Bubbles"
-              required
-            />
-          </label>
-          <label>
-            Favorite thing
-            <input
-              name="favorite"
-              type="text"
-              placeholder="e.g. unicorns, candy, rainbows"
-              required
-            />
-          </label>
-          <label>
-            Message
-            <textarea
-              name="message"
-              rows="4"
-              placeholder="Tell BIGEM something sweet..."
-              required
-            />
-          </label>
-          <button type="submit" className="btn primary-btn">
-            <Heart className="icon" /> Send love
+        <header className="nav-panel">
+          <div className="logo-badge">BIGEM</div>
+          <button
+            type="button"
+            className="nav-toggle"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-expanded={mobileMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X /> : <Menu />}
           </button>
-        </form>
-      </section>
-    </main>
+          <nav className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
+            <a href="#about" onClick={() => setMobileMenuOpen(false)}>
+              About
+            </a>
+            <a href="#magic" onClick={() => setMobileMenuOpen(false)}>
+              Magic
+            </a>
+            <a href="#buy" onClick={() => setMobileMenuOpen(false)}>
+              Buy
+            </a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
+              Contact
+            </a>
+          </nav>
+        </header>
+
+        <section className="hero-section">
+          <motion.div
+            className="hero-copy"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <span className="hero-tag">Welcome to my kawaii corner</span>
+            <h1>
+              Hi, I&apos;m <span>BIGEM</span>
+            </h1>
+            <p>
+              A cute React + Next.js playground with canvas sprites, bubbly
+              motion, and soft pastel energy.
+            </p>
+
+            <div className="hero-actions">
+              <button
+                type="button"
+                className="btn hero-btn"
+                onClick={() => scrollToSection("#about")}
+              >
+                <Sparkles className="icon" /> Explore
+              </button>
+              <button
+                type="button"
+                className="btn ghost-btn"
+                onClick={() => scrollToSection("#contact")}
+              >
+                <span className="icon">📩</span> Send a smile
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="hero-card"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={
+              pulseMagic
+                ? { scale: [1, 1.03, 1], rotate: [0, 2, -2, 0], opacity: 1 }
+                : { scale: 1, opacity: 1 }
+            }
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            <div className="cute-face">
+              <div className="cheek left" />
+              <div className="cheek right" />
+              <div className="mouth" />
+            </div>
+            <div className="hero-sparkles">
+              <span>💖</span>
+              <span>🌟</span>
+              <span>🍓</span>
+            </div>
+          </motion.div>
+        </section>
+
+        <section id="about" className="section-panel">
+          <div className="section-heading">
+            <span className="label">About BIGEM</span>
+            <h2>Design made for curious kids and charming dreamers</h2>
+          </div>
+
+          <div className="feature-grid">
+            {featureItems.map((item) => (
+              <motion.article
+                key={item.title}
+                className="feature-card"
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 260, damping: 18 }}
+              >
+                <div className="feature-icon">{item.icon}</div>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section id="magic" className="section-panel magic-panel">
+          <div className="magic-layout">
+            <div>
+              <span className="label">Canvas magic</span>
+              <h2>
+                Animated shapes, floating sprites, and a playful Node-powered
+                API.
+              </h2>
+              <p>
+                This site uses Next.js for React rendering, Framer Motion for
+                page animation, GSAP for subtle effects, and a small API route
+                to show Node.js capability.
+              </p>
+              <div className="magic-buttons">
+                <button
+                  type="button"
+                  className="btn soft-btn"
+                  onClick={handleCuteMotion}
+                >
+                  <Star className="icon" /> Cute motion
+                </button>
+                <button
+                  type="button"
+                  className="btn soft-btn"
+                  onClick={handleApiDemo}
+                >
+                  <Command className="icon" /> Node API
+                </button>
+              </div>
+              {statusMessage ? (
+                <div className="status-banner">{statusMessage}</div>
+              ) : null}
+              {apiResponse ? (
+                <div className="api-response">{apiResponse}</div>
+              ) : null}
+            </div>
+
+            <div className="magic-card">
+              <div className="magic-card-badge">Kawaii Lab</div>
+              <p>
+                Everything here is cute, responsive, and built with React
+                components backed by Next.js routes.
+              </p>
+              <div className="mini-card-grid">
+                <div className="mini-card">🍬 Candy code</div>
+                <div className="mini-card">✨ Sparkly state</div>
+                <div className="mini-card">🌈 Smooth motion</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="buy" className="section-panel buy-section">
+          <div className="section-heading">
+            <span className="label">Buy Bigem ChupaChups</span>
+            <h2>Choose how many chupa chups and pay with eSewa or Khalti</h2>
+          </div>
+
+          <div className="buy-layout">
+            <div className="buy-card">
+              <label>
+                Chupa Chups quantity
+                <input
+                  type="number"
+                  min="1"
+                  value={chupaCount}
+                  onChange={handleAmountChange}
+                />
+              </label>
+              <p className="buy-summary">
+                Rs.{costPerChupa} each ={" "}
+                <strong>Rs.{chupaCount * costPerChupa}</strong>
+              </p>
+              <div className="payment-buttons">
+                <button
+                  type="button"
+                  className="btn soft-btn"
+                  onClick={handleEsewaPayment}
+                >
+                  Pay with eSewa
+                </button>
+                <button
+                  type="button"
+                  className="btn soft-btn"
+                  onClick={handleKhaltiPayment}
+                >
+                  Pay with Khalti
+                </button>
+              </div>
+              <p className="payment-note">
+                The payment flow is not active yet. Clicking the buttons will
+                show a placeholder message.
+              </p>
+              <p className="payment-hint">
+                Thanks for waiting — the checkout feature is coming soon.
+              </p>
+              {purchaseMessage ? (
+                <div className="status-banner">{purchaseMessage}</div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="section-panel contact-section">
+          <div className="section-heading">
+            <span className="label">Say Hello</span>
+            <h2>Send a cute message to BIGEM</h2>
+          </div>
+
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <label>
+              Your nickname
+              <input
+                name="name"
+                type="text"
+                placeholder="e.g. Bubbles"
+                required
+              />
+            </label>
+            <label>
+              Favorite thing
+              <input
+                name="favorite"
+                type="text"
+                placeholder="e.g. unicorns, candy, rainbows"
+                required
+              />
+            </label>
+            <label>
+              Message
+              <textarea
+                name="message"
+                rows="4"
+                placeholder="Tell BIGEM something sweet..."
+                required
+              />
+            </label>
+            <button type="submit" className="btn primary-btn">
+              <Heart className="icon" /> Send love
+            </button>
+          </form>
+        </section>
+      </main>
+    </>
   );
 }
