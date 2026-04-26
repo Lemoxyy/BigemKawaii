@@ -324,14 +324,14 @@ export default function Home() {
                   className="btn soft-btn"
                   onClick={handleEsewaPayment}
                 >
-                  Pay with eSewa
+                  Pay with eSewa (coming soon)
                 </button>
                 <button
                   type="button"
                   className="btn soft-btn"
                   onClick={handleKhaltiPayment}
                 >
-                  Pay with Khalti
+                  Pay with Khalti (coming soon)
                 </button>
               </div>
               <p className="payment-note">
