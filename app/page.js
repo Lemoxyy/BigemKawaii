@@ -35,6 +35,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chupaCount, setChupaCount] = useState(1);
   const [purchaseMessage, setPurchaseMessage] = useState("");
+  const [showEsewaQR, setShowEsewaQR] = useState(false);
+  const [showKhaltiQR, setShowKhaltiQR] = useState(false);
   const costPerChupa = 15;
   const khaltiPublicKey = process.env.NEXT_PUBLIC_KHALTI_PUBLIC_KEY;
   const esewaMerchantId = process.env.NEXT_PUBLIC_ESEWA_MERCHANT_ID;
@@ -72,15 +74,15 @@ export default function Home() {
   };
 
   const handleEsewaPayment = () => {
-    setPurchaseMessage(
-      "Payment is not completed yet. Please check back soon for the full checkout flow.",
-    );
+    setShowEsewaQR(true);
+    setShowKhaltiQR(false);
+    setPurchaseMessage("");
   };
 
   const handleKhaltiPayment = () => {
-    setPurchaseMessage(
-      "Payment is not completed yet. Please check back soon for the full checkout flow.",
-    );
+    setShowKhaltiQR(true);
+    setShowEsewaQR(false);
+    setPurchaseMessage("");
   };
 
   const handleApiDemo = async () => {
@@ -333,22 +335,56 @@ export default function Home() {
                   className="btn soft-btn"
                   onClick={handleEsewaPayment}
                 >
-                  Pay with eSewa (coming soon)
+                  Pay with eSewa
                 </button>
                 <button
                   type="button"
                   className="btn soft-btn"
                   onClick={handleKhaltiPayment}
                 >
-                  Pay with Khalti (coming soon)
+                  Pay with Khalti
                 </button>
               </div>
+              {showEsewaQR && (
+                <div className="qr-display">
+                  <h3>Scan eSewa QR Code</h3>
+                  <img
+                    src="/eSewa.jpg"
+                    alt="eSewa QR Code"
+                    style={{ maxWidth: "200px", height: "auto" }}
+                  />
+                  <button
+                    type="button"
+                    className="btn ghost-btn"
+                    onClick={() => setShowEsewaQR(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+              {showKhaltiQR && (
+                <div className="qr-display">
+                  <h3>Scan Khalti QR Code</h3>
+                  <img
+                    src="/khalti.png"
+                    alt="Khalti QR Code"
+                    style={{ maxWidth: "200px", height: "auto" }}
+                  />
+                  <button
+                    type="button"
+                    className="btn ghost-btn"
+                    onClick={() => setShowKhaltiQR(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
               <p className="payment-note">
-                The payment flow is not active yet. Clicking the buttons will
-                show a placeholder message.
+                For now, click the buttons to view the QR codes for payment.
               </p>
               <p className="payment-hint">
-                Thanks for waiting — the checkout feature is coming soon.
+                Scan the QR code with your eSewa or Khalti app to complete the
+                payment.
               </p>
               {purchaseMessage ? (
                 <div className="status-banner">{purchaseMessage}</div>
